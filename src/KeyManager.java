@@ -9,12 +9,21 @@ import java.security.*;
 import java.util.Arrays;
 import java.util.Base64;
 
+/**
+ * Genera la clave pública y privada, comparte la clave pública mediante un fichero
+ * y desencripta un mensaje
+ */
 public class KeyManager {
+
     /**
-     * Contiene claves pública y privada
+     * KeyPair Contiene claves pública y privada
      */
     private KeyPair keyPair;
 
+    /**
+     * Para mostrar la clave pública en el programa principal ({@code Main})
+     * @return la clave pública
+     */
     public PublicKey getPublicKey() {
         return keyPair.getPublic();
     }
@@ -29,6 +38,9 @@ public class KeyManager {
         keyPair = generator.generateKeyPair();
     }
 
+    /**
+     * Escribe los bytes de la clave pública
+     */
     public void writePublicKey() throws IOException {
         Files.createDirectories(Path.of("files"));
         try (FileOutputStream fos = new FileOutputStream("files/public.key")) {
@@ -38,12 +50,23 @@ public class KeyManager {
         }
     }
 
+    /**
+     * Lee el fichero cifrado y devuelve el mensaje descifrado
+     *
+     * @return el mensaje descifrado
+     */
     public String decryptFile() throws Exception {
         File encryptedFile = new File("files/encrypted_msg");
         byte[] encryptedBytes = Files.readAllBytes(encryptedFile.toPath());
         return decrypt(encryptedBytes);
     }
 
+    /**
+     * Descifra un mensaje cifrado
+     *
+     * @param encryptedBytes Bytes del mensaje encriptado
+     * @return El mensaje descifrado
+     */
     private String decrypt(byte[] encryptedBytes) throws Exception {
         Cipher cipher = Cipher.getInstance("RSA");
         cipher.init(Cipher.DECRYPT_MODE, keyPair.getPrivate()); // Clave privada para desencriptar

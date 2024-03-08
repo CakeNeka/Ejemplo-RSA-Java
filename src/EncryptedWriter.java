@@ -8,10 +8,21 @@ import java.security.*;
 import java.security.spec.EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 
+/**
+ * Lee el fichero que contiene la clave pública y escribe un mensaje cifrado
+ * con esta clave.
+ *
+ * Como esta clase únicamente conoce la clave pública, solo puede
+ * encriptar datos.
+ */
 public class EncryptedWriter {
     private String secretMessage;
     private PublicKey publicKey;
 
+    /**
+     * Establece el mensaje secreto a encriptar
+     * @param secretMessage String del mensaje secreto
+     */
     public void setSecretMessage(String secretMessage) {
         this.secretMessage = secretMessage;
     }
@@ -27,6 +38,14 @@ public class EncryptedWriter {
         publicKey = keyFactory.generatePublic(publicKeySpec);
     }
 
+    /**
+     * Escribe el mensaje cifrado en el fichero files/encrypted_msg
+     *
+     * Escribe directamente los bytes del mensaje encriptado para
+     * evitar transformaciones innecesarias a String
+     * @return Los bytes del mensaje encriptado, para mostrarlo en el método principal
+     * @throws Exception
+     */
     public byte[] writeEncryptedMessage() throws Exception{
         byte[] messageBytes = secretMessage.getBytes();
         Cipher cipher = Cipher.getInstance("RSA");
@@ -34,9 +53,9 @@ public class EncryptedWriter {
         byte[] encryptedBytes = cipher.doFinal(messageBytes);
 
 
-        Files.createDirectories(Path.of("files"));
+        Files.createDirectories(Path.of("files")); // Crea el directorio si no existe
         try (FileOutputStream fos = new FileOutputStream("files/encrypted_msg")) {
-            fos.write(encryptedBytes);
+            fos.write(encryptedBytes); // Escribe los bytes en el fichero
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
